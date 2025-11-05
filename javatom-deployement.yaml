@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javatom
+  labels:
+    app: javatom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: javatom
+  template:
+    metadata:
+      labels:
+        app: javatom
+    spec:
+      containers:
+      - name: javatom
+        image: kushalk999/javacomcat2:final
+        ports:
+        - containerPort: 80
