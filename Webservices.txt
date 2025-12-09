@@ -1,0 +1,93 @@
+Web service exercise
+
+Step 1:
+1. Install IntelliJ IDEA Ultimate (Community Edition does not support full Java EE
+deployment).
+2. Install Apache Tomcat 9 or 10.
+3. Install JDK 8–17 (recommended for JAX-WS compatibility).
+
+Configure Tomcat in IntelliJ:
+- Go to File → Settings → Build, Execution, Deployment → Application Servers.
+- Click + → Tomcat Server → Browse to installation directory → OK.
+
+Step 2: web service (server side)
+Step 1: Create a Java Web Application
+
+- File → New → Project → Java Enterprise → Web Application.
+- Project Name: AddService
+- Application Server: Tomcat 9.0
+- Click Finish.
+
+Step 2: Create the Service Class in src/main/java/com/example/calculator
+
+package com.example.calculator;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+@WebService
+public class OperatorService {
+@WebMethod
+public int add(int a, int b) { return a + b; }
+@WebMethod
+
+public int sub(int a, int b) { return a - b; }
+@WebMethod
+public int mul(int a, int b) { return a * b; }
+@WebMethod
+public int div(int a, int b) { return a / b; }
+}
+
+Step 3: Publish the Web Service
+
+package com.example.calculator;
+import javax.xml.ws.Endpoint;
+public class OperatorPublisher {
+public static void main(String[] args) {
+String url = &quot;http://localhost:8080/calculator&quot;;
+Endpoint.publish(url, new OperatorService());
+System.out.println(&quot;Service started at: &quot; + url + &quot;?wsdl&quot;);
+}
+}
+
+Run OperatorPublisher to start the web service, then open
+http://localhost:8080/calculator?wsdl to verify.
+
+Step 3: create client to consume web service
+Step 1: Create a New Project
+
+- File → New → Project → Java Application
+- Project Name: AddServiceClient
+- No server required.
+
+Step 2: Generate Client Stubs from WSDL
+
+In the terminal, run:
+wsimport -keep -p com.example.client http://localhost:8080/calculator?wsdl
+
+This generates proxy classes in com.example.client.
+
+Step 4: Create the Client Application
+
+package com.example.client;
+public class TestOperatorClient {
+public static void main(String[] args) {
+OperatorService service = new OperatorService();
+OperatorServiceSoap port = service.getOperatorServiceSoap();
+System.out.println(&quot;Add: &quot; + port.add(10, 5));
+System.out.println(&quot;Sub: &quot; + port.sub(10, 5));
+System.out.println(&quot;Mul: &quot; + port.mul(10, 5));
+System.out.println(&quot;Div: &quot; + port.div(10, 5));
+}
+}
+
+Run the client while the service is active. Expected Output:
+Add: 15
+Sub: 5
+Mul: 50
+Div: 2
+
+Note:
+
+- IntelliJ uses wsgen and wsimport tools for JAX-WS.
+- To deploy to Tomcat as a WAR file:
+• Go to File → Project Structure → Artifacts → Add → Web Application: Exploded.
+• Add WEB-INF/classes and run via Run → Edit Configurations → Tomcat Server → Local.
